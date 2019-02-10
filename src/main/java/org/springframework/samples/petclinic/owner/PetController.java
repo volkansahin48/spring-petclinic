@@ -23,6 +23,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.time.LocalDate;
 import java.util.Collection;
 
 /**
@@ -75,6 +77,9 @@ class PetController {
     public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model) {
         if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null){
             result.rejectValue("name", "duplicate", "already exists");
+        }
+        else if(pet.getBirthDate().isAfter(LocalDate.now()) || LocalDate.now().equals(pet.getBirthDate())) {
+        	result.rejectValue("birthDate", "invalidDate", "invalid birth date");
         }
         owner.addPet(pet);
         if (result.hasErrors()) {
